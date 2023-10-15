@@ -9,6 +9,8 @@ const defaultErrorObject = () => ({
     emailErrorMessage: [],
     emailConfirmError: false,
     emailConfirmErrorMessage: [],
+    gdprError: false,
+    gdprErrorMessage: [],
 });
 
 // Function to return the Default User Data Object
@@ -17,7 +19,7 @@ const defaultUserData = () => ({
     email: '',
     emailConfirm: '',
     referal: '',
-    gdpr: '',
+    gdpr: false,
 });
 
 // Validate the given User Data
@@ -47,8 +49,14 @@ const validate = (userData = {}) => {
         errorObject.emailConfirmErrorMessage.push('Erősítse meg email címét!');
     }
 
+    // Validate GDPR
+    if (!userData?.gdpr) {
+        errorObject.gdprError = true;
+        errorObject.gdprErrorMessage.push('Fogadja el a GDPR!');
+    };
+
     // Evaluate data
-    if (errorObject.nameError || errorObject.emailError || errorObject.emailConfirmError) {
+    if (errorObject.nameError || errorObject.emailError || errorObject.emailConfirmError || errorObject.gdprError) {
         buildRegistrationForm(userData, errorObject);
     } else {
         successfullRegistration(userData);
@@ -56,7 +64,8 @@ const validate = (userData = {}) => {
 };
 
 // Build Registration Form
-const buildRegistrationForm = (userData = defaultUserData(), errorObject = defaultErrorObject()) => {
+const buildRegistrationForm = (userData = {}, errorObject = {}) => {
+    let isGdprChecked = userData.gdpr;
 
     // Function that builds the error message container
     const buildErrorMessageContainer = (errorMessage) => {
@@ -89,9 +98,19 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     // Registration Form
     const registrationForm = document.createElement('form');
     registrationForm.classList.add('registration-form');
+    registrationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        validate({
+            name: nameInput.value,
+            email: emailInput.value,
+            emailConfirm: emailConfirmInput.value,
+            referal: dropDownSelectedValue.innerHTML,
+            gdpr: isGdprChecked,
+        });
+    });
 
     // Username Wrapper
-    let nameWrapper = document.createElement('div');
+    const nameWrapper = document.createElement('div');
     userData.name ? nameWrapper.classList.add('active') : false;
 
     // Username Label
@@ -123,7 +142,7 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     registrationForm.appendChild(nameWrapper);
 
     /* Email Wrapper */
-    let emailWrapper = document.createElement('div');
+    const emailWrapper = document.createElement('div');
     userData.email ? emailWrapper.classList.add('active') : false;
 
     // Email Label
@@ -155,7 +174,7 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     registrationForm.appendChild(emailWrapper);
 
     /* Email Confirm Wrapper */
-    let emailConfirmWrapper = document.createElement('div');
+    const emailConfirmWrapper = document.createElement('div');
     userData.emailConfirm ? emailConfirmWrapper.classList.add('active') : false;
 
     // Email Confirm Label
@@ -186,6 +205,105 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     // Append Email Confirm Wrapper to Registration Form
     registrationForm.appendChild(emailConfirmWrapper);
 
+    /* Referal Wrapper */
+    const referalWrapper = document.createElement('div');
+    referalWrapper.classList.add('referal-wrapper');
+
+    // Referal Label
+    const referalLabel = document.createElement('label');
+    referalLabel.innerHTML = "Honnan hallott rólunk?"
+    referalLabel.setAttribute('for', 'referal');
+    referalLabel.addEventListener('click', () => false);
+    referalWrapper.appendChild(referalLabel);
+
+    // Dropdown Values
+    const dropDownValues = ['Internetről', 'Televízióból', 'Egyéb helyről']
+
+    // Dropdown Container
+    const dropDownContainer = document.createElement('div');
+    dropDownContainer.classList.add('drop-down-container');
+
+    // Dropdown Selected Value
+    const dropDownSelectedValue = document.createElement('div');
+    dropDownSelectedValue.classList.add('drop-down-selected-value');
+    dropDownSelectedValue.innerHTML = dropDownValues[0];
+    dropDownSelectedValue.addEventListener('click', () => {
+        if (!dropDownContainer.classList.contains('active')) {
+            dropDownContainer.classList.add('active');
+        } else {
+            dropDownContainer.classList.remove('active');
+        }
+    });
+    dropDownContainer.appendChild(dropDownSelectedValue);
+
+    // Dropdown Value Container
+    const dropDownValueContainer = document.createElement('div');
+    dropDownValueContainer.classList.add('drop-down-value-container');
+
+    // Drop Down Values
+    dropDownValues.forEach(value => {
+        let div = document.createElement('div');
+        div.innerHTML = value;
+        div.addEventListener('click', (e) => {
+            dropDownSelectedValue.innerHTML = e.target.innerHTML;
+
+            if (dropDownContainer.classList.contains('active')) {
+                dropDownContainer.classList.remove('active');
+            }
+        });
+
+        dropDownValueContainer.appendChild(div);
+    });
+
+    // Append Dropdown Value Container to Drop Down Container
+    dropDownContainer.appendChild(dropDownValueContainer);
+
+    // Drop Down Container Wrapper to Append Referal Wrapper
+    referalWrapper.appendChild(dropDownContainer);
+
+    // Append Referal Wrapper to Registration Form
+    registrationForm.appendChild(referalWrapper);
+
+    /* GDPR Wrapper */
+    const gdprWrapper = document.createElement('div');
+    gdprWrapper.classList.add('gdpr-wrapper');
+
+    // GDPR Text
+    const gdprText = document.createElement('label');
+    gdprText.innerHTML = 'Elfogadom a GDPR-t';
+    gdprWrapper.appendChild(gdprText);
+
+    // GDPR Checkbox
+    const gdprCheckboxContainer = document.createElement('div');
+    gdprCheckboxContainer.style.position = 'relative';
+    gdprCheckboxContainer.style.display = 'inline';
+
+    const gdprCheckbox = document.createElement('div');
+    gdprCheckbox.classList.add('checkbox');
+    isGdprChecked ? gdprCheckbox.classList.add('active') : false;
+    gdprCheckboxContainer.appendChild(gdprCheckbox);
+
+    gdprWrapper.appendChild(gdprCheckboxContainer);
+    gdprWrapper.addEventListener('click', () => {
+        if (gdprCheckbox.classList.contains('active')) {
+            gdprCheckbox.classList.remove('active');
+            isGdprChecked = false;
+        } else {
+            gdprCheckbox.classList.add('active');
+            isGdprChecked = true;
+        }
+    });
+
+    // Username Error
+    if (errorObject.gdprError) {
+        errorObject.gdprErrorMessage.forEach(errorMessage => {
+            gdprWrapper.appendChild(buildErrorMessageContainer(errorMessage));
+        });
+    };
+
+    // Append GDPR Wrapper to Registration Form
+    registrationForm.appendChild(gdprWrapper);
+
     // Submit Button
     const submitButton = document.createElement('input');
     submitButton.value = "Regisztráció";
@@ -198,6 +316,8 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
             name: nameInput.value,
             email: emailInput.value,
             emailConfirm: emailConfirmInput.value,
+            referal: dropDownSelectedValue.innerHTML,
+            gdpr: isGdprChecked,
         });
     });
 
@@ -238,4 +358,4 @@ const successfullRegistration = (userData = {}) => {
     container.appendChild(messageContainer);
 };
 
-buildRegistrationForm();
+buildRegistrationForm(defaultUserData(), defaultErrorObject());
