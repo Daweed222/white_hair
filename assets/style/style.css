@@ -12,3 +12,126 @@ html,
     font-size: 1rem;
     color: var(--primary);
 }
+
+body {
+    background-color: var(--primary);
+}
+
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    font-family: 'Spectral';
+    font-size: 2rem;
+    color: var(--secondary);
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.btn.primary {
+    width: 100%;
+    padding: 15px;
+    border: 0;
+    background: var(--secondary);
+    color: #FFF;
+    font-weight: 500;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.25s ease-in-out;
+}
+
+.btn.primary:hover {
+    background: #a96e63;
+}
+
+/* Bootstrap Danger Alert Style */
+.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    position: relative;
+    padding: .75rem 1.25rem;
+    margin-top: 1rem;
+    border: 1px solid transparent;
+    border-radius: 25px;
+}
+
+.registration-form,
+.registration-message {
+    width: 420px;
+    background: #fff;
+    padding: 50px 25px;
+    border-radius: 25px;
+}
+
+.registration-form>div {
+    position: relative;
+    margin: 0 0 45px;
+}
+
+.registration-form>div>label {
+    position: absolute;
+    top: 4px;
+    left: 11px;
+    transition: 0.25s;
+    font-family: 'Spectral';
+    cursor: text;
+}
+
+.registration-form>div.active>label {
+    top: -23px;
+    left: 0px;
+    font-weight: 700;
+}
+
+.registration-form>div>input {
+    width: 100%;
+    padding: 5px 10px;
+    border: 1px solid var(--primary);
+    border-radius: 25px;
+}
+
+.registration-message h1 {
+    margin-bottom: 15px;
+}
+
+.registration-message h2 {
+    margin-bottom: 30px;
+
+}
+
+.registration-message h1,
+.registration-message h2,
+.registration-message div {
+    text-align: center;
+}
+
+@media (max-width: 420px) {
+    #registration-form-container {
+        width: 100%;
+    }
+
+    .registration-form,
+    .registration-message {
+        width: 100%;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+
+    .registration-form>div>label {
+        top: 14px;
+        left: 11px;
+    }
+
+    .registration-form>div>input {
+        padding: 15px 10px;
+    }
+}

@@ -48,27 +48,58 @@ const validate = (userData = {}) => {
     }
 
     // Evaluate data
-    buildRegistrationForm(userData, errorObject);
+    if (errorObject.nameError || errorObject.emailError || errorObject.emailConfirmError) {
+        buildRegistrationForm(userData, errorObject);
+    } else {
+        successfullRegistration(userData);
+    }
 };
 
 // Build Registration Form
 const buildRegistrationForm = (userData = defaultUserData(), errorObject = defaultErrorObject()) => {
-    console.log([errorObject, userData]);
+
+    // Function that builds the error message container
+    const buildErrorMessageContainer = (errorMessage) => {
+        const errorMessageContainer = document.createElement('div');
+        errorMessageContainer.classList.add('error');
+        errorMessageContainer.innerHTML = errorMessage;
+
+        return errorMessageContainer;
+    };
+
+    const handleInputFocusIn = (wrapper) => {
+        if (wrapper) {
+            if (!wrapper.classList.contains('active')) {
+                wrapper.classList.add('active');
+            }
+        }
+    };
+
+    const handleInputFocusOut = (e, wrapper) => {
+        if (wrapper) {
+            if (e.target.value.length === 0) {
+                wrapper.classList.remove('active');
+            }
+        }
+    };
 
     // Container RESET to Default
     container.innerHTML = '';
 
     // Registration Form
     const registrationForm = document.createElement('form');
+    registrationForm.classList.add('registration-form');
 
     // Username Wrapper
-    let wrapper = document.createElement('div');
+    let nameWrapper = document.createElement('div');
+    userData.name ? nameWrapper.classList.add('active') : false;
 
     // Username Label
     const nameLabel = document.createElement('label');
     nameLabel.innerHTML = "Név"
     nameLabel.setAttribute('for', 'user_name');
-    wrapper.appendChild(nameLabel);
+    nameLabel.addEventListener('click', () => handleInputFocusIn(nameWrapper));
+    nameWrapper.appendChild(nameLabel);
 
     // Username Input
     const nameInput = document.createElement('input');
@@ -77,29 +108,30 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     nameInput.setAttribute('type', 'text');
     nameInput.setAttribute('placeholder', '');
     userData.name ? nameInput.value = userData.name : false;
-    wrapper.appendChild(nameInput);
+    nameInput.addEventListener('focus', () => handleInputFocusIn(nameWrapper));
+    nameInput.addEventListener('focusout', (e) => handleInputFocusOut(e, nameWrapper));
+    nameWrapper.appendChild(nameInput);
 
     // Username Error
     if (errorObject.nameError) {
         errorObject.nameErrorMessage.forEach(errorMessage => {
-            const errorMessageContainer = document.createElement('div');
-            errorMessageContainer.classList.add('error');
-            errorMessageContainer.innerHTML = errorMessage;
-            wrapper.appendChild(errorMessageContainer);
+            nameWrapper.appendChild(buildErrorMessageContainer(errorMessage));
         });
     };
 
     // Append Username Wrapper to the Registration Form
-    registrationForm.appendChild(wrapper);
+    registrationForm.appendChild(nameWrapper);
 
     /* Email Wrapper */
-    wrapper = document.createElement('div');
+    let emailWrapper = document.createElement('div');
+    userData.email ? emailWrapper.classList.add('active') : false;
 
     // Email Label
     const emailLabel = document.createElement('label');
     emailLabel.innerHTML = "Email"
     emailLabel.setAttribute('for', 'email');
-    wrapper.appendChild(emailLabel);
+    emailLabel.addEventListener('click', () => handleInputFocusIn(emailWrapper));
+    emailWrapper.appendChild(emailLabel);
 
     // Email Input
     const emailInput = document.createElement('input');
@@ -108,65 +140,65 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
     emailInput.setAttribute('type', 'text');
     emailInput.setAttribute('placeholder', '');
     userData.email ? emailInput.value = userData.email : false;
-    wrapper.appendChild(emailInput);
+    emailInput.addEventListener('focus', () => handleInputFocusIn(emailWrapper));
+    emailInput.addEventListener('focusout', (e) => handleInputFocusOut(e, emailWrapper));
+    emailWrapper.appendChild(emailInput);
 
     // Email Error
     if (errorObject.emailError) {
         errorObject.emailErrorMessage.forEach(errorMessage => {
-            const errorMessageContainer = document.createElement('div');
-            errorMessageContainer.classList.add('error');
-            errorMessageContainer.innerHTML = errorMessage;
-            wrapper.appendChild(errorMessageContainer);
+            emailWrapper.appendChild(buildErrorMessageContainer(errorMessage));
         });
     };
 
     // Append Email Wrapper to Registration Form
-    registrationForm.appendChild(wrapper);
+    registrationForm.appendChild(emailWrapper);
 
     /* Email Confirm Wrapper */
-    wrapper = document.createElement('div');
+    let emailConfirmWrapper = document.createElement('div');
+    userData.emailConfirm ? emailConfirmWrapper.classList.add('active') : false;
 
     // Email Confirm Label
     const emailConfirmLabel = document.createElement('label');
     emailConfirmLabel.innerHTML = "Email megerősítés"
     emailConfirmLabel.setAttribute('for', 'email-confirm');
-    wrapper.appendChild(emailConfirmLabel);
+    emailConfirmLabel.addEventListener('click', () => handleInputFocusIn(emailConfirmWrapper));
+    emailConfirmWrapper.appendChild(emailConfirmLabel);
 
     // Email Confirm Input
     const emailConfirmInput = document.createElement('input');
-    emailConfirmInput.id = 'email-confrim';
+    emailConfirmInput.id = 'email-confirm';
     emailConfirmInput.setAttribute('title', 'Email megerősítés');
     emailConfirmInput.setAttribute('type', 'text');
     emailConfirmInput.setAttribute('placeholder', '');
     userData.emailConfirm ? emailConfirmInput.value = userData.emailConfirm : false;
-    wrapper.appendChild(emailConfirmInput);
+    emailConfirmInput.addEventListener('focus', () => handleInputFocusIn(emailConfirmWrapper));
+    emailConfirmInput.addEventListener('focusout', (e) => handleInputFocusOut(e, emailConfirmWrapper));
+    emailConfirmWrapper.appendChild(emailConfirmInput);
 
     // Email Confirm Errors
     if (errorObject.emailConfirmError) {
         errorObject.emailConfirmErrorMessage.forEach(errorMessage => {
-            const errorMessageContainer = document.createElement('div');
-            errorMessageContainer.classList.add('error');
-            errorMessageContainer.innerHTML = errorMessage;
-            wrapper.appendChild(errorMessageContainer);
+            emailConfirmWrapper.appendChild(buildErrorMessageContainer(errorMessage));
         });
     };
 
     // Append Email Confirm Wrapper to Registration Form
-    registrationForm.appendChild(wrapper);
+    registrationForm.appendChild(emailConfirmWrapper);
 
     // Submit Button
     const submitButton = document.createElement('input');
+    submitButton.value = "Regisztráció";
     submitButton.setAttribute('type', 'submit');
+    submitButton.classList.add('btn', 'primary');
     submitButton.addEventListener('click', (e) => {
         e.preventDefault();
 
-        const userData = {
+        validate({
             name: nameInput.value,
             email: emailInput.value,
             emailConfirm: emailConfirmInput.value,
-        }
-
-        validate(userData);
+        });
     });
 
     // Append Submit Button to the Registration Container
@@ -174,6 +206,36 @@ const buildRegistrationForm = (userData = defaultUserData(), errorObject = defau
 
     // Append Registration Form to it's Container
     container.appendChild(registrationForm);
+};
+
+// Successfull Registration Message Render
+const successfullRegistration = (userData = {}) => {
+    // Container RESET to Default
+    container.innerHTML = '';
+
+    // Message Container
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('registration-message');
+
+    // Message Header
+    const messageHeader = document.createElement('h1');
+    messageHeader.innerHTML = 'Sikeres Regisztráció!';
+    messageContainer.appendChild(messageHeader);
+
+    // Message Sub Header
+    const messageSubHeader = document.createElement('h2');
+    messageSubHeader.innerHTML = userData.name;
+    messageContainer.appendChild(messageSubHeader);
+
+    // New User Registration Button
+    const registerNewUser = document.createElement('div');
+    registerNewUser.innerHTML = 'Új felhasználó regisztrálása';
+    registerNewUser.classList.add('btn', 'primary');
+    registerNewUser.addEventListener('click', buildRegistrationForm);
+    messageContainer.appendChild(registerNewUser);
+
+    // Append Message Container to it's Container
+    container.appendChild(messageContainer);
 };
 
 buildRegistrationForm();
