@@ -1,5 +1,7 @@
+// Default Registration Form Container
 const container = document.getElementById('registration-form-container');
 
+// Function to return the Default Error Object
 const defaultErrorObject = () => ({
     nameError: false,
     nameErrorMessage: [],
@@ -9,6 +11,7 @@ const defaultErrorObject = () => ({
     emailConfirmErrorMessage: [],
 });
 
+// Function to return the Default User Data Object
 const defaultUserData = () => ({
     name: '',
     email: '',
@@ -17,19 +20,23 @@ const defaultUserData = () => ({
     gdpr: '',
 });
 
+// Validate the given User Data
 const validate = (userData = {}) => {
     const errorObject = defaultErrorObject();
 
+    // Validate Username
     if (userData?.name?.length === 0) {
         errorObject.nameError = true;
         errorObject.nameErrorMessage.push('Név nem lehet üres!');
     };
 
+    // Validate Email
     if (userData?.email?.length === 0) {
         errorObject.emailError = true;
         errorObject.emailErrorMessage.push('Email nem lehet üres!');
     };
 
+    // Validate Email Confirm
     if (userData?.emailConfirm?.length !== 0) {
         if (userData.email !== userData.emailConfirm) {
             errorObject.emailConfirmError = true;
@@ -40,22 +47,30 @@ const validate = (userData = {}) => {
         errorObject.emailConfirmErrorMessage.push('Erősítse meg email címét!');
     }
 
-    registrationForm(userData, errorObject);
+    // Evaluate data
+    buildRegistrationForm(userData, errorObject);
 };
 
-const registrationForm = (userData = defaultUserData(), errorObject = defaultErrorObject()) => {
+// Build Registration Form
+const buildRegistrationForm = (userData = defaultUserData(), errorObject = defaultErrorObject()) => {
     console.log([errorObject, userData]);
+
+    // Container RESET to Default
     container.innerHTML = '';
+
+    // Registration Form
     const registrationForm = document.createElement('form');
 
-    // Username Label and Input
+    // Username Wrapper
     let wrapper = document.createElement('div');
 
+    // Username Label
     const nameLabel = document.createElement('label');
     nameLabel.innerHTML = "Név"
     nameLabel.setAttribute('for', 'user_name');
     wrapper.appendChild(nameLabel);
 
+    // Username Input
     const nameInput = document.createElement('input');
     nameInput.id = 'user_name';
     nameInput.setAttribute('title', 'Név');
@@ -64,6 +79,7 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
     userData.name ? nameInput.value = userData.name : false;
     wrapper.appendChild(nameInput);
 
+    // Username Error
     if (errorObject.nameError) {
         errorObject.nameErrorMessage.forEach(errorMessage => {
             const errorMessageContainer = document.createElement('div');
@@ -73,16 +89,19 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
         });
     };
 
+    // Append Username Wrapper to the Registration Form
     registrationForm.appendChild(wrapper);
 
-    // Email Label and Input
+    /* Email Wrapper */
     wrapper = document.createElement('div');
 
+    // Email Label
     const emailLabel = document.createElement('label');
     emailLabel.innerHTML = "Email"
     emailLabel.setAttribute('for', 'email');
     wrapper.appendChild(emailLabel);
 
+    // Email Input
     const emailInput = document.createElement('input');
     emailInput.id = 'email';
     emailInput.setAttribute('title', 'Email');
@@ -91,6 +110,7 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
     userData.email ? emailInput.value = userData.email : false;
     wrapper.appendChild(emailInput);
 
+    // Email Error
     if (errorObject.emailError) {
         errorObject.emailErrorMessage.forEach(errorMessage => {
             const errorMessageContainer = document.createElement('div');
@@ -100,16 +120,19 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
         });
     };
 
+    // Append Email Wrapper to Registration Form
     registrationForm.appendChild(wrapper);
 
-    // Email Confirm Label and Input
+    /* Email Confirm Wrapper */
     wrapper = document.createElement('div');
 
+    // Email Confirm Label
     const emailConfirmLabel = document.createElement('label');
     emailConfirmLabel.innerHTML = "Email megerősítés"
     emailConfirmLabel.setAttribute('for', 'email-confirm');
     wrapper.appendChild(emailConfirmLabel);
 
+    // Email Confirm Input
     const emailConfirmInput = document.createElement('input');
     emailConfirmInput.id = 'email-confrim';
     emailConfirmInput.setAttribute('title', 'Email megerősítés');
@@ -118,6 +141,7 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
     userData.emailConfirm ? emailConfirmInput.value = userData.emailConfirm : false;
     wrapper.appendChild(emailConfirmInput);
 
+    // Email Confirm Errors
     if (errorObject.emailConfirmError) {
         errorObject.emailConfirmErrorMessage.forEach(errorMessage => {
             const errorMessageContainer = document.createElement('div');
@@ -127,6 +151,7 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
         });
     };
 
+    // Append Email Confirm Wrapper to Registration Form
     registrationForm.appendChild(wrapper);
 
     // Submit Button
@@ -144,12 +169,11 @@ const registrationForm = (userData = defaultUserData(), errorObject = defaultErr
         validate(userData);
     });
 
+    // Append Submit Button to the Registration Container
     registrationForm.appendChild(submitButton);
 
     // Append Registration Form to it's Container
     container.appendChild(registrationForm);
 };
 
-
-
-registrationForm();
+buildRegistrationForm();
